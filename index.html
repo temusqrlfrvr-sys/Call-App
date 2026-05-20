@@ -41,7 +41,6 @@
             border: 1px solid #334155;
         }
 
-        /* Header / Identity Status */
         .header {
             text-align: center;
             margin-top: 20px;
@@ -65,7 +64,6 @@
             border: 1px solid #334155;
         }
 
-        /* Main Screen State */
         .screen-content {
             display: flex;
             flex-direction: column;
@@ -113,7 +111,6 @@
             margin-bottom: 5px;
         }
 
-        /* Dialer Input Box */
         .dialer-input-box {
             width: 100%;
             background: #0f172a;
@@ -127,7 +124,6 @@
             outline: none;
         }
 
-        /* Control / Action Buttons */
         .controls {
             display: flex;
             justify-content: center;
@@ -223,16 +219,17 @@
     <script>
         let peer;
         let currentCall = null;
-        let dataConnection = null; // Parallel channel for signaling events like Hang up
+        let dataConnection = null; 
         let pendingCallEvent = null; 
         let localStream = null;
-        let ringInterval = null;
+        let audioAudioLoop = null;
+        let callTimeoutTimer = null;
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-        // Professional Telephone Ring System (Loops)
-        function startRingtone() {
-            stopRingtone();
+        // 1. Professional INCOMING Ringtone System (Loops)
+        function startIncomingRingtone() {
+            stopAudioSounds();
             function playInstance() {
                 let osc1 = audioCtx.createOscillator();
                 let osc2 = audioCtx.createOscillator();
@@ -245,14 +242,36 @@
                 setTimeout(() => { try { osc1.stop(); osc2.stop(); } catch(e){} }, 1800);
             }
             playInstance();
-            ringInterval = setInterval(playInstance, 3000);
+            audioAudioLoop = setInterval(playInstance, 3000);
         }
 
-        function stopRingtone() {
-            if (ringInterval) { clearInterval(ringInterval); ringInterval = null; }
+        // 2. Professional OUTGOING Dial Sound System (Loops while calling someone)
+        function startOutgoingDialSound() {
+            stopAudioSounds();
+            function playInstance() {
+                let osc1 = audioCtx.createOscillator();
+                let osc2 = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                // Standard US Ringback tones (440Hz + 480Hz audible click)
+                osc1.type = 'sine'; osc1.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc2.type = 'sine'; osc2.frequency.setValueAtTime(480, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
+                osc1.start(); osc2.start();
+                setTimeout(() => { try { osc1.stop(); osc2.stop(); } catch(e){} }, 1000); // 1-second ring length
+            }
+            playInstance();
+            audioAudioLoop = setInterval(playInstance, 3000); // Repeat cadence cycle
         }
 
-        // Initialize PeerJS Connection
+        function stopAudioSounds() {
+            if (audioAudioLoop) {
+                clearInterval(audioAudioLoop);
+                audioAudioLoop = null;
+            }
+        }
+
+        // Initialize PeerJS Connections
         function initPeer() {
             const shortId = Math.floor(1000 + Math.random() * 9000).toString();
             peer = new Peer(shortId);
@@ -261,7 +280,6 @@
                 document.getElementById('display-id').innerText = "Device ID: " + id;
             });
 
-            // Listen for data signals (like forcing a hang up display)
             peer.on('connection', (conn) => {
                 dataConnection = conn;
                 setupDataListener(conn);
@@ -270,7 +288,7 @@
             // Handle Incoming Call Event
             peer.on('call', (call) => {
                 pendingCallEvent = call;
-                startRingtone();
+                startIncomingRingtone();
                 
                 document.getElementById('status').innerText = "Incoming Call...";
                 document.getElementById('avatar').className = "avatar-circle incoming";
@@ -278,14 +296,22 @@
                 document.getElementById('call-btn').style.display = 'none';
                 document.getElementById('accept-btn').style.display = 'flex';
                 document.getElementById('hangup-btn').style.display = 'flex';
+
+                // 10-Second Auto-Timeout if receiver doesn't pick up
+                callTimeoutTimer = setTimeout(() => {
+                    if (pendingCallEvent) {
+                        endCallWithStatus("No Answer");
+                    }
+                }, 10 * 1000);
             });
         }
 
-        // Handle text data commands
         function setupDataListener(conn) {
             conn.on('data', (data) => {
                 if (data === "HANGUP") {
-                    triggerCallEndedState();
+                    triggerCallEndedState("Call Ended");
+                } else if (data === "TIMEOUT_REJECT") {
+                    triggerCallEndedState("No Answer");
                 }
             });
         }
@@ -299,8 +325,12 @@
             }
 
             document.getElementById('status').innerText = "Calling...";
+            document.getElementById('hangup-btn').style.display = 'flex';
+            document.getElementById('call-btn').style.display = 'none';
+            document.getElementById('remote-id-input').style.display = 'none';
             
-            // Create data tunnel first to manage sync signals
+            startOutgoingDialSound();
+
             dataConnection = peer.connect(remoteId);
             setupDataListener(dataConnection);
 
@@ -309,16 +339,30 @@
                     localStream = stream;
                     const call = peer.call(remoteId, stream);
                     handleActiveCall(call);
+
+                    // 10-Second Auto-Timeout on caller side if answer takes too long
+                    callTimeoutTimer = setTimeout(() => {
+                        if (currentCall && document.getElementById('status').innerText === "Calling...") {
+                            if (dataConnection && dataConnection.open) {
+                                dataConnection.send("TIMEOUT_REJECT");
+                            }
+                            setTimeout(() => {
+                                endCallWithStatus("No Answer");
+                            }, 100);
+                        }
+                    }, 10 * 1000);
+
                 }).catch(err => {
                     alert("Microphone access denied: " + err);
+                    resetToReadyState();
                 });
         }
 
         // User hits the Green Accept button
         function acceptCall() {
-            stopRingtone();
+            clearTimeout(callTimeoutTimer);
+            stopAudioSounds();
             if (pendingCallEvent) {
-                // Connect back data channel to caller
                 dataConnection = peer.connect(pendingCallEvent.peer);
                 setupDataListener(dataConnection);
 
@@ -339,30 +383,31 @@
         function handleActiveCall(call) {
             currentCall = call;
 
-            document.getElementById('status').innerText = "Connected";
-            document.getElementById('avatar').className = "avatar-circle active";
-            document.getElementById('remote-id-input').style.display = 'none';
-            document.getElementById('call-btn').style.display = 'none';
-            document.getElementById('accept-btn').style.display = 'none';
-            document.getElementById('hangup-btn').style.display = 'flex';
-
+            // If it connects before 10 seconds, clear the dialing sound and timeout clocks
             call.on('stream', (remoteStream) => {
+                clearTimeout(callTimeoutTimer);
+                stopAudioSounds();
+                
+                document.getElementById('status').innerText = "Connected";
+                document.getElementById('avatar').className = "avatar-circle active";
+                document.getElementById('accept-btn').style.display = 'none';
+                document.getElementById('hangup-btn').style.display = 'flex';
+
                 const audio = new Audio();
                 audio.srcObject = remoteStream;
                 audio.play();
             });
 
-            // Fallback listener
             call.on('close', () => {
-                triggerCallEndedState();
+                triggerCallEndedState("Call Ended");
             });
         }
 
-        // When a user hits the hang up button locally
+        // When local user hits Hang Up manually
         function endCall() {
-            stopRingtone();
+            clearTimeout(callTimeoutTimer);
+            stopAudioSounds();
             
-            // CRITICAL SYNC FIX: Explicitly tell the other device to display "Call Ended"
             if (dataConnection && dataConnection.open) {
                 dataConnection.send("HANGUP");
             }
@@ -370,31 +415,40 @@
             setTimeout(() => {
                 if (pendingCallEvent) { pendingCallEvent.close(); pendingCallEvent = null; }
                 if (currentCall) { currentCall.close(); currentCall = null; }
-                triggerCallEndedState();
-            }, 100); // Tiny delay to ensure text instruction sends successfully
+                triggerCallEndedState("Call Ended");
+            }, 100); 
         }
 
-        // Shows "Call Ended" on screen before wiping states clean
-        function triggerCallEndedState() {
-            stopRingtone();
+        // Special programmatic hang up for timeouts
+        function endCallWithStatus(statusMessage) {
+            clearTimeout(callTimeoutTimer);
+            stopAudioSounds();
+            if (pendingCallEvent) { pendingCallEvent.close(); pendingCallEvent = null; }
+            if (currentCall) { currentCall.close(); currentCall = null; }
+            triggerCallEndedState(statusMessage);
+        }
+
+        // Shows the descriptive ending state on both screens
+        function triggerCallEndedState(statusMessage) {
+            clearTimeout(callTimeoutTimer);
+            stopAudioSounds();
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
             }
 
-            document.getElementById('status').innerText = "Call Ended";
+            document.getElementById('status').innerText = statusMessage;
             document.getElementById('avatar').className = "avatar-circle ended";
             document.getElementById('hangup-btn').style.display = 'none';
             document.getElementById('accept-btn').style.display = 'none';
 
-            // Leave message on screen for 3 seconds, then clear out
             setTimeout(() => {
                 resetToReadyState();
             }, 3000);
         }
 
         function resetToReadyState() {
-            // Only clear UI if we are actually resting
-            if (document.getElementById('status').innerText === "Call Ended") {
+            const currentStatus = document.getElementById('status').innerText;
+            if (currentStatus === "Call Ended" || currentStatus === "No Answer") {
                 document.getElementById('status').innerText = "Ready";
                 document.getElementById('avatar').className = "avatar-circle";
                 document.getElementById('call-btn').style.display = 'flex';
