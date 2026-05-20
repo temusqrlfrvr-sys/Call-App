@@ -176,6 +176,32 @@
             background: #16a34a;
         }
 
+        /* Setup Activation Button overlay */
+        .audio-gate-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #0f172a;
+            z-index: 99;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .gate-btn {
+            background: #38bdf8;
+            color: #0f172a;
+            padding: 15px 30px;
+            font-weight: bold;
+            font-size: 18px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
             70% { box-shadow: 0 0 0 20px rgba(56, 189, 248, 0); }
@@ -186,6 +212,12 @@
 <body>
 
     <div class="phone-container">
+        <div class="audio-gate-overlay" id="audio-gate">
+            <h2>CallAndroid</h2>
+            <p style="color: #94a3b8; margin-top: 10px;">Tap below to enable system audio, microphone access, and incoming ringtones.</p>
+            <button class="gate-btn" onclick="activateSystemAudio()">Turn System On</button>
+        </div>
+
         <div class="header">
             <div class="app-title">CallAndroid</div>
             <div class="local-id" id="display-id">Initializing system...</div>
@@ -224,12 +256,24 @@
         let localStream = null;
         let audioAudioLoop = null;
         let callTimeoutTimer = null;
+        let audioCtx = null;
 
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // Activates Web Audio Context on clean User Interaction to bypass browser blocks
+        function activateSystemAudio() {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            // Hide startup lock screen overlay
+            document.getElementById('audio-gate').style.display = 'none';
+            initPeer();
+        }
 
         // 1. Professional INCOMING Ringtone System (Loops)
         function startIncomingRingtone() {
             stopAudioSounds();
+            if(!audioCtx) return;
+            
             function playInstance() {
                 let osc1 = audioCtx.createOscillator();
                 let osc2 = audioCtx.createOscillator();
@@ -248,20 +292,21 @@
         // 2. Professional OUTGOING Dial Sound System (Loops while calling someone)
         function startOutgoingDialSound() {
             stopAudioSounds();
+            if(!audioCtx) return;
+
             function playInstance() {
                 let osc1 = audioCtx.createOscillator();
                 let osc2 = audioCtx.createOscillator();
                 let gain = audioCtx.createGain();
-                // Standard US Ringback tones (440Hz + 480Hz audible click)
                 osc1.type = 'sine'; osc1.frequency.setValueAtTime(440, audioCtx.currentTime);
                 osc2.type = 'sine'; osc2.frequency.setValueAtTime(480, audioCtx.currentTime);
                 gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
                 osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
                 osc1.start(); osc2.start();
-                setTimeout(() => { try { osc1.stop(); osc2.stop(); } catch(e){} }, 1000); // 1-second ring length
+                setTimeout(() => { try { osc1.stop(); osc2.stop(); } catch(e){} }, 1000);
             }
             playInstance();
-            audioAudioLoop = setInterval(playInstance, 3000); // Repeat cadence cycle
+            audioAudioLoop = setInterval(playInstance, 3000);
         }
 
         function stopAudioSounds() {
@@ -288,7 +333,7 @@
             // Handle Incoming Call Event
             peer.on('call', (call) => {
                 pendingCallEvent = call;
-                startIncomingRingtone();
+                startIncomingRingtone(); // Plays incoming call notify sound immediately
                 
                 document.getElementById('status').innerText = "Incoming Call...";
                 document.getElementById('avatar').className = "avatar-circle incoming";
@@ -297,7 +342,6 @@
                 document.getElementById('accept-btn').style.display = 'flex';
                 document.getElementById('hangup-btn').style.display = 'flex';
 
-                // 10-Second Auto-Timeout if receiver doesn't pick up
                 callTimeoutTimer = setTimeout(() => {
                     if (pendingCallEvent) {
                         endCallWithStatus("No Answer");
@@ -318,6 +362,8 @@
 
         // Start Outbound Phone Call
         function startCall() {
+            if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); }
+            
             const remoteId = document.getElementById('remote-id-input').value.trim();
             if (!remoteId) {
                 alert("Please type a Device ID to connect.");
@@ -340,7 +386,6 @@
                     const call = peer.call(remoteId, stream);
                     handleActiveCall(call);
 
-                    // 10-Second Auto-Timeout on caller side if answer takes too long
                     callTimeoutTimer = setTimeout(() => {
                         if (currentCall && document.getElementById('status').innerText === "Calling...") {
                             if (dataConnection && dataConnection.open) {
@@ -379,11 +424,9 @@
             }
         }
 
-        // Handle Active Connected Call Session
         function handleActiveCall(call) {
             currentCall = call;
 
-            // If it connects before 10 seconds, clear the dialing sound and timeout clocks
             call.on('stream', (remoteStream) => {
                 clearTimeout(callTimeoutTimer);
                 stopAudioSounds();
@@ -403,7 +446,6 @@
             });
         }
 
-        // When local user hits Hang Up manually
         function endCall() {
             clearTimeout(callTimeoutTimer);
             stopAudioSounds();
@@ -419,7 +461,6 @@
             }, 100); 
         }
 
-        // Special programmatic hang up for timeouts
         function endCallWithStatus(statusMessage) {
             clearTimeout(callTimeoutTimer);
             stopAudioSounds();
@@ -428,7 +469,6 @@
             triggerCallEndedState(statusMessage);
         }
 
-        // Shows the descriptive ending state on both screens
         function triggerCallEndedState(statusMessage) {
             clearTimeout(callTimeoutTimer);
             stopAudioSounds();
@@ -459,8 +499,6 @@
                 pendingCallEvent = null;
             }
         }
-
-        initPeer();
     </script>
 </body>
 </html>
