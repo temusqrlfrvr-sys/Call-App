@@ -8,203 +8,82 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 0; overflow: hidden; }
+        
+        .phone-container { 
+            background: #1e293b; width: 100vw; height: 100vh; 
+            display: flex; flex-direction: column; justify-content: space-between; 
+            padding: 20px 15px; position: relative; overflow: hidden;
         }
 
-        body {
-            background: #0f172a;
-            color: #f8fafc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+        /* Sign up Overlay */
+        .overlay { 
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #0f172a; 
+            z-index: 99; display: flex; flex-direction: column; justify-content: center; 
+            align-items: center; padding: 25px; text-align: center; 
         }
+        .input-field { 
+            width: 100%; background: #1e293b; border: 1px solid #475569; padding: 12px; 
+            color: white; border-radius: 10px; margin-top: 15px; text-align: center; font-size: 16px; outline: none;
+        }
+        .gate-btn { background: #38bdf8; color: #0f172a; padding: 12px 25px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 20px; width: 100%; }
+        .choice-container { display: flex; gap: 10px; margin-top: 15px; width: 100%; }
+        .choice-btn { flex: 1; padding: 10px; background: #334155; border: 1px solid #475569; color: white; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        .choice-btn.active { background: #38bdf8; color: #0f172a; font-weight: bold; }
 
-        .phone-container {
-            background: #1e293b;
-            width: 100%;
-            max-width: 400px;
-            height: 650px;
-            border-radius: 30px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 40px 20px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid #334155;
-        }
+        /* Top Header Area */
+        .header { text-align: center; margin-top: 10px; }
+        .app-title { font-size: 18px; font-weight: 600; color: #38bdf8; letter-spacing: 1px; margin-bottom: 5px; }
+        .local-id { background: #0f172a; padding: 6px 14px; border-radius: 20px; display: inline-block; font-size: 13px; color: #94a3b8; border: 1px solid #334155; }
 
-        .header {
-            text-align: center;
-            margin-top: 20px;
-        }
+        /* Dashboard Views */
+        .tab-content { flex-grow: 1; display: none; flex-direction: column; justify-content: center; align-items: center; margin-top: 10px; }
+        .tab-content.active { display: flex; }
 
-        .app-title {
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: #38bdf8;
-            margin-bottom: 10px;
-        }
+        /* Keypad Screen Layout */
+        .dial-display-container { width: 100%; display: flex; align-items: center; background: #0f172a; border-radius: 10px; padding: 5px 10px; margin-bottom: 15px; border: 1px solid #334155; }
+        .dial-display { flex-grow: 1; height: 40px; border: none; background: transparent; color: white; font-size: 24px; text-align: center; font-weight: bold; outline: none; pointer-events: none; }
+        .dial-display.keyboard-mode { pointer-events: auto; background: #1e293b; }
+        .action-icon-btn { background: transparent; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; padding: 5px; }
+        .action-icon-btn:active { color: white; }
 
-        .local-id {
-            background: #0f172a;
-            padding: 8px 16px;
-            border-radius: 20px;
-            display: inline-block;
-            font-size: 14px;
-            color: #94a3b8;
-            border: 1px solid #334155;
-        }
+        .keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 90%; margin-bottom: 15px; }
+        .key-btn { background: #334155; border: none; border-radius: 50%; aspect-ratio: 1; font-size: 22px; font-weight: 600; color: white; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: background 0.1s; }
+        .key-btn:active { background: #475569; }
+        
+        .main-call-btn { width: 65px; height: 65px; border-radius: 50%; border: none; color: white; font-size: 24px; cursor: pointer; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
+        .bg-green { background: #22c55e; }
+        .bg-red { background: #ef4444; }
 
-        .screen-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-            margin-bottom: 40px;
-        }
+        /* Calling Takeover Screen */
+        .call-screen { position: absolute; top: 0; bottom: 0; left: 0; right: 0; background: #1e293b; z-index: 10; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .avatar-circle { width: 120px; height: 120px; background: #334155; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 45px; color: #94a3b8; margin-bottom: 25px; }
+        .avatar-circle.incoming { background: #38bdf8; color: white; animation: pulse 1.5s infinite; }
+        .avatar-circle.active { background: #22c55e; color: white; animation: pulse 2s infinite; }
+        .avatar-circle.ended { background: #ef4444; color: white; }
+        .status-text { font-size: 22px; font-weight: 600; margin-bottom: 35px; }
+        .call-controls { display: flex; gap: 40px; }
 
-        .avatar-circle {
-            width: 120px;
-            height: 120px;
-            background: #334155;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 48px;
-            color: #94a3b8;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-        }
+        /* Settings and Contacts Layouts */
+        .pane-card { width: 100%; height: 100%; padding: 10px; display: flex; flex-direction: column; align-items: flex-start; }
+        .pane-title { font-size: 18px; margin-bottom: 15px; color: #38bdf8; font-weight: 600; }
+        .setting-row { width: 100%; display: flex; flex-direction: column; margin-bottom: 15px; }
+        .setting-label { font-size: 14px; color: #94a3b8; margin-bottom: 5px; }
+        .dropdown { width: 100%; background: #0f172a; color: white; padding: 12px; border-radius: 8px; border: 1px solid #334155; font-size: 15px; outline: none; }
+        
+        .contact-item { width: 100%; background: #0f172a; padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #334155; display: flex; justify-content: space-between; }
+        .contact-code { color: #38bdf8; font-weight: 600; }
 
-        .avatar-circle.active {
-            background: #22c55e;
-            color: white;
-            animation: pulse 2s infinite;
-        }
-
-        .avatar-circle.incoming {
-            background: #38bdf8;
-            color: white;
-            animation: pulse 1.5s infinite;
-        }
-
-        .avatar-circle.ended {
-            background: #ef4444;
-            color: white;
-        }
-
-        .status-text {
-            font-size: 18px;
-            font-weight: 600;
-            color: #f1f5f9;
-            margin-bottom: 5px;
-        }
-
-        .dialer-input-box {
-            width: 100%;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 12px;
-            color: white;
-            font-size: 16px;
-            text-align: center;
-            margin-bottom: 20px;
-            outline: none;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            width: 100%;
-        }
-
-        .btn {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            color: white;
-            transition: transform 0.1s ease, background 0.2s ease;
-        }
-
-        .btn:active {
-            transform: scale(0.9);
-        }
-
-        .btn-call {
-            background: #22c55e;
-        }
-
-        .btn-call:hover {
-            background: #16a34a;
-        }
-
-        .btn-hangup {
-            background: #ef4444;
-            display: none; 
-        }
-
-        .btn-hangup:hover {
-            background: #dc2626;
-        }
-
-        .btn-accept {
-            background: #22c55e;
-            display: none;
-        }
-
-        .btn-accept:hover {
-            background: #16a34a;
-        }
-
-        /* Setup Activation Button overlay */
-        .audio-gate-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #0f172a;
-            z-index: 99;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .gate-btn {
-            background: #38bdf8;
-            color: #0f172a;
-            padding: 15px 30px;
-            font-weight: bold;
-            font-size: 18px;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
+        /* Bottom Navigation Bar */
+        .bottom-nav { height: 65px; border-top: 1px solid #334155; display: flex; justify-content: space-around; align-items: center; background: #0f172a; margin: 0 -15px -20px -15px; padding-bottom: 5px; }
+        .nav-item { background: transparent; border: none; color: #64748b; display: flex; flex-direction: column; align-items: center; font-size: 11px; cursor: pointer; gap: 4px; }
+        .nav-item i { font-size: 20px; }
+        .nav-item.active { color: #38bdf8; }
 
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
-            70% { box-shadow: 0 0 0 20px rgba(56, 189, 248, 0); }
+            70% { box-shadow: 0 0 0 15px rgba(56, 189, 248, 0); }
             100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
         }
     </style>
@@ -212,292 +91,315 @@
 <body>
 
     <div class="phone-container">
-        <div class="audio-gate-overlay" id="audio-gate">
-            <h2>CallAndroid</h2>
-            <p style="color: #94a3b8; margin-top: 10px;">Tap below to enable system audio, microphone access, and incoming ringtones.</p>
-            <button class="gate-btn" onclick="activateSystemAudio()">Turn System On</button>
+        <div class="overlay" id="signup-gate">
+            <h2 style="color: #38bdf8; font-size: 26px;">CallAndroid</h2>
+            <p style="color: #94a3b8; font-size: 14px; margin-top: 5px;">Set up your permanent identity profile</p>
+            
+            <div class="choice-container">
+                <button class="choice-btn active" id="btn-choice-email" onclick="setIdentityMode('email')">Private Email</button>
+                <button class="choice-btn" id="btn-choice-ip" onclick="setIdentityMode('ip')">Network IP</button>
+            </div>
+
+            <input type="text" class="input-field" id="identity-input" placeholder="Enter your email address">
+            <button class="gate-btn" onclick="activateSystem()">Turn System On</button>
+        </div>
+
+        <div class="call-screen" id="call-panel">
+            <div class="avatar-circle" id="call-avatar"><i class="fa-solid fa-user"></i></div>
+            <div class="status-text" id="call-status">Ready</div>
+            <div class="call-controls">
+                <button class="main-call-btn bg-green" id="panel-accept-btn" onclick="acceptCall()"><i class="fa-solid fa-phone"></i></button>
+                <button class="main-call-btn bg-red" id="panel-hangup-btn" onclick="endCall()"><i class="fa-solid fa-phone-slash"></i></button>
+            </div>
         </div>
 
         <div class="header">
             <div class="app-title">CallAndroid</div>
-            <div class="local-id" id="display-id">Initializing system...</div>
+            <div class="local-id" id="display-id">Configuring Network ID...</div>
         </div>
 
-        <div class="screen-content">
-            <div class="avatar-circle" id="avatar"><i class="fa-solid fa-user"></i></div>
-            <div class="status-text" id="status">Ready</div>
+        <div class="tab-content active" id="view-keypad">
+            <div class="dial-display-container">
+                <button class="action-icon-btn" onclick="toggleKeyboardInput()"><i class="fa-solid fa-keyboard"></i></button>
+                <input type="text" class="dial-display" id="dial-screen" readonly placeholder="Dial Code">
+                <button class="action-icon-btn" onclick="keypadBackspace()"><i class="fa-solid fa-delete-left"></i></button>
+            </div>
+
+            <div class="keypad-grid">
+                <button class="key-btn" onclick="keypadPress('1')">1</button>
+                <button class="key-btn" onclick="keypadPress('2')">2</button>
+                <button class="key-btn" onclick="keypadPress('3')">3</button>
+                <button class="key-btn" onclick="keypadPress('4')">4</button>
+                <button class="key-btn" onclick="keypadPress('5')">5</button>
+                <button class="key-btn" onclick="keypadPress('6')">6</button>
+                <button class="key-btn" onclick="keypadPress('7')">7</button>
+                <button class="key-btn" onclick="keypadPress('8')">8</button>
+                <button class="key-btn" onclick="keypadPress('9')">9</button>
+                <button class="key-btn" onclick="keypadPress('*')">*</button>
+                <button class="key-btn" onclick="keypadPress('0')">0</button>
+                <button class="key-btn" onclick="keypadPress('#')">#</button>
+            </div>
+
+            <button class="main-call-btn bg-green" onclick="startCall()"><i class="fa-solid fa-phone"></i></button>
         </div>
 
-        <div>
-            <input type="text" class="dialer-input-box" id="remote-id-input" placeholder="Enter Device ID to Call">
-            
-            <div class="controls">
-                <button class="btn btn-call" id="call-btn" onclick="startCall()">
-                    <i class="fa-solid fa-phone"></i>
-                </button>
-                
-                <button class="btn btn-accept" id="accept-btn" onclick="acceptCall()">
-                    <i class="fa-solid fa-phone"></i>
-                </button>
-                
-                <button class="btn btn-hangup" id="hangup-btn" onclick="endCall()">
-                    <i class="fa-solid fa-phone-slash"></i>
-                </button>
+        <div class="tab-content" id="view-contacts">
+            <div class="pane-card">
+                <div class="pane-title">Saved Contacts</div>
+                <div class="contact-item">
+                    <span>Intercom Base A</span>
+                    <span class="contact-code">8a4b</span>
+                </div>
+                <div class="contact-item">
+                    <span>Intercom Base B</span>
+                    <span class="contact-code">192a</span>
+                </div>
             </div>
         </div>
+
+        <div class="tab-content" id="view-settings">
+            <div class="pane-card">
+                <div class="pane-title">Device Settings</div>
+                <div class="setting-row">
+                    <label class="setting-label">Incoming Ringtone Alert</label>
+                    <select class="dropdown" id="ringtone-selection">
+                        <option value="marimba">Marimba (Apple Cadence)</option>
+                        <option value="electric">Classic Electric Office</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <button class="nav-item active" id="nav-keypad" onclick="switchTab('keypad')"><i class="fa-solid fa-keyboard"></i>Keypad</button>
+            <button class="nav-item" id="nav-contacts" onclick="switchTab('contacts')"><i class="fa-solid fa-address-book"></i>Contacts</button>
+            <button class="nav-item" id="nav-settings" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i>Settings</button>
+        </nav>
     </div>
 
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <script>
-        let peer;
+        let selectedMode = 'email';
+        let peer = null;
         let currentCall = null;
-        let dataConnection = null; 
-        let pendingCallEvent = null; 
+        let dataConnection = null;
+        let pendingCallEvent = null;
         let localStream = null;
-        let audioAudioLoop = null;
-        let callTimeoutTimer = null;
+        let soundIntervalLoop = null;
+        let timeoutClock = null;
         let audioCtx = null;
 
-        // Activates Web Audio Context on clean User Interaction to bypass browser blocks
-        function activateSystemAudio() {
+        function setIdentityMode(mode) {
+            selectedMode = mode;
+            document.getElementById('btn-choice-email').className = mode === 'email' ? 'choice-btn active' : 'choice-btn';
+            document.getElementById('btn-choice-ip').className = mode === 'ip' ? 'choice-btn active' : 'choice-btn';
+            const input = document.getElementById('identity-input');
+            if(mode === 'ip') { input.style.display = 'none'; } 
+            else { input.style.display = 'block'; input.placeholder = "Enter your email address"; }
+        }
+
+        function toggleKeyboardInput() {
+            const display = document.getElementById('dial-screen');
+            if(display.hasAttribute('readonly')) {
+                display.removeAttribute('readonly');
+                display.classList.add('keyboard-mode');
+                display.focus();
+            } else {
+                display.setAttribute('readonly', 'true');
+                display.classList.remove('keyboard-mode');
+            }
+        }
+
+        function keypadPress(val) { document.getElementById('dial-screen').value += val; }
+        function keypadBackspace() {
+            let cur = document.getElementById('dial-screen').value;
+            document.getElementById('dial-screen').value = cur.substring(0, cur.length - 1);
+        }
+
+        function switchTab(target) {
+            ['keypad', 'contacts', 'settings'].forEach(t => {
+                document.getElementById('view-' + t).classList.remove('active');
+                document.getElementById('nav-' + t).classList.remove('active');
+            });
+            document.getElementById('view-' + target).classList.add('active');
+            document.getElementById('nav-' + target).classList.add('active');
+        }
+
+        function secureHashString(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); }
+            const charset = "0123456789abcdefghijklmnopqrstuv"; 
+            let code = ""; hash = Math.abs(hash);
+            for(let j=0; j<4; j++) { code += charset[(hash + j) % charset.length]; }
+            return code;
+        }
+
+        function activateSystem() {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
+            let identityCode = "";
+            if(selectedMode === 'email') {
+                const em = document.getElementById('identity-input').value.trim();
+                if(!em || !em.includes('@')) { alert("Please type a valid email address."); return; }
+                identityCode = secureHashString(em);
+            } else {
+                identityCode = Math.floor(1000 + Math.random() * 9000).toString();
             }
-            // Hide startup lock screen overlay
-            document.getElementById('audio-gate').style.display = 'none';
-            initPeer();
+            document.getElementById('signup-gate').style.display = 'none';
+            setupConnectionNetwork(identityCode);
         }
 
-        // 1. Professional INCOMING Ringtone System (Loops)
-        function startIncomingRingtone() {
-            stopAudioSounds();
+        function stopAllActiveAudio() { if(soundIntervalLoop) { clearInterval(soundIntervalLoop); soundIntervalLoop = null; } }
+
+        function playOutgoingBuzzPattern() {
+            stopAllActiveAudio();
             if(!audioCtx) return;
-            
-            function playInstance() {
-                let osc1 = audioCtx.createOscillator();
-                let osc2 = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc1.type = 'sine'; osc1.frequency.setValueAtTime(440, audioCtx.currentTime); 
-                osc2.type = 'sine'; osc2.frequency.setValueAtTime(480, audioCtx.currentTime); 
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
-                osc1.start(); osc2.start();
-                setTimeout(() => { try { osc1.stop(); osc2.stop(); } catch(e){} }, 1800);
+            function run() {
+                let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start();
+                setTimeout(() => { try{ osc.stop(); }catch(e){} }, 1000);
             }
-            playInstance();
-            audioAudioLoop = setInterval(playInstance, 3000);
+            run(); soundIntervalLoop = setInterval(run, 3000);
         }
 
-        // 2. Professional OUTGOING Dial Sound System (Loops while calling someone)
-        function startOutgoingDialSound() {
-            stopAudioSounds();
+        function playIncomingChosenRingtone() {
+            stopAllActiveAudio();
             if(!audioCtx) return;
-
-            function playInstance() {
-                let osc1 = audioCtx.createOscillator();
-                let osc2 = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc1.type = 'sine'; osc1.frequency.setValueAtTime(440, audioCtx.currentTime);
-                osc2.type = 'sine'; osc2.frequency.setValueAtTime(480, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
-                osc1.start(); osc2.start();
-                setTimeout(() => { try { osc1.stop(); osc2.stop(); } catch(e){} }, 1000);
-            }
-            playInstance();
-            audioAudioLoop = setInterval(playInstance, 3000);
-        }
-
-        function stopAudioSounds() {
-            if (audioAudioLoop) {
-                clearInterval(audioAudioLoop);
-                audioAudioLoop = null;
-            }
-        }
-
-        // Initialize PeerJS Connections
-        function initPeer() {
-            const shortId = Math.floor(1000 + Math.random() * 9000).toString();
-            peer = new Peer(shortId);
-
-            peer.on('open', (id) => {
-                document.getElementById('display-id').innerText = "Device ID: " + id;
-            });
-
-            peer.on('connection', (conn) => {
-                dataConnection = conn;
-                setupDataListener(conn);
-            });
-
-            // Handle Incoming Call Event
-            peer.on('call', (call) => {
-                pendingCallEvent = call;
-                startIncomingRingtone(); // Plays incoming call notify sound immediately
-                
-                document.getElementById('status').innerText = "Incoming Call...";
-                document.getElementById('avatar').className = "avatar-circle incoming";
-                document.getElementById('remote-id-input').style.display = 'none';
-                document.getElementById('call-btn').style.display = 'none';
-                document.getElementById('accept-btn').style.display = 'flex';
-                document.getElementById('hangup-btn').style.display = 'flex';
-
-                callTimeoutTimer = setTimeout(() => {
-                    if (pendingCallEvent) {
-                        endCallWithStatus("No Answer");
-                    }
-                }, 10 * 1000);
-            });
-        }
-
-        function setupDataListener(conn) {
-            conn.on('data', (data) => {
-                if (data === "HANGUP") {
-                    triggerCallEndedState("Call Ended");
-                } else if (data === "TIMEOUT_REJECT") {
-                    triggerCallEndedState("No Answer");
+            const ringerType = document.getElementById('ringtone-selection').value;
+            function run() {
+                if(ringerType === 'marimba') {
+                    let times = [0, 0.15, 0.3, 0.45]; let freqs = [784, 880, 988, 1046];
+                    times.forEach((t, i) => {
+                        let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                        osc.type = 'sine'; osc.frequency.setValueAtTime(freqs[i], audioCtx.currentTime + t);
+                        gain.gain.setValueAtTime(0.15, audioCtx.currentTime + t);
+                        osc.connect(gain); gain.connect(audioCtx.destination);
+                        osc.start(audioCtx.currentTime + t);
+                        setTimeout(() => { try{ osc.stop(); }catch(e){} }, 250 + (t*1000));
+                    });
+                } else {
+                    let osc1 = audioCtx.createOscillator(); let osc2 = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                    osc1.type = 'sine'; osc1.frequency.setValueAtTime(440, audioCtx.currentTime);
+                    osc2.type = 'sine'; osc2.frequency.setValueAtTime(480, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
+                    osc1.start(); osc2.start();
+                    setTimeout(() => { try{ osc1.stop(); osc2.stop(); }catch(e){} }, 1500);
                 }
+            }
+            run(); soundIntervalLoop = setInterval(run, 3000);
+        }
+
+        function setupConnectionNetwork(assignedId) {
+            peer = new Peer(assignedId);
+            peer.on('open', (id) => { document.getElementById('display-id').innerText = "Your Device Code: " + id; });
+            peer.on('connection', (conn) => { dataConnection = conn; bindDataEvents(conn); });
+            peer.on('call', (call) => {
+                pendingCallEvent = call; playIncomingChosenRingtone();
+                document.getElementById('call-panel').style.display = 'flex';
+                document.getElementById('call-status').innerText = "Incoming Call...";
+                document.getElementById('call-avatar').className = "avatar-circle incoming";
+                document.getElementById('panel-accept-btn').style.display = 'flex';
+                timeoutClock = setTimeout(() => { if (pendingCallEvent) endCallWithStatus("No Answer"); }, 10000);
             });
         }
 
-        // Start Outbound Phone Call
+        function bindDataEvents(conn) {
+            conn.on('data', (msg) => {
+                if (msg === "HANGUP") triggerUIDisplayEnded("Call Ended");
+                else if (msg === "TIMEOUT") triggerUIDisplayEnded("No Answer");
+            });
+        }
+
         function startCall() {
-            if (audioCtx && audioCtx.state === 'suspended') { audioCtx.resume(); }
-            
-            const remoteId = document.getElementById('remote-id-input').value.trim();
-            if (!remoteId) {
-                alert("Please type a Device ID to connect.");
-                return;
-            }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            const targetCode = document.getElementById('dial-screen').value.trim();
+            if(!targetCode) { alert("Please input a target device code first."); return; }
 
-            document.getElementById('status').innerText = "Calling...";
-            document.getElementById('hangup-btn').style.display = 'flex';
-            document.getElementById('call-btn').style.display = 'none';
-            document.getElementById('remote-id-input').style.display = 'none';
-            
-            startOutgoingDialSound();
+            document.getElementById('call-panel').style.display = 'flex';
+            document.getElementById('call-status').innerText = "Calling...";
+            document.getElementById('panel-accept-btn').style.display = 'none';
+            document.getElementById('call-avatar').className = "avatar-circle";
 
-            dataConnection = peer.connect(remoteId);
-            setupDataListener(dataConnection);
+            playOutgoingBuzzPattern();
+            dataConnection = peer.connect(targetCode);
+            bindDataEvents(dataConnection);
 
             navigator.mediaDevices.getUserMedia({ audio: true, video: false })
                 .then((stream) => {
                     localStream = stream;
-                    const call = peer.call(remoteId, stream);
-                    handleActiveCall(call);
-
-                    callTimeoutTimer = setTimeout(() => {
-                        if (currentCall && document.getElementById('status').innerText === "Calling...") {
-                            if (dataConnection && dataConnection.open) {
-                                dataConnection.send("TIMEOUT_REJECT");
-                            }
-                            setTimeout(() => {
-                                endCallWithStatus("No Answer");
-                            }, 100);
+                    const call = peer.call(targetCode, stream);
+                    processCallStream(call);
+                    timeoutClock = setTimeout(() => {
+                        if (currentCall && document.getElementById('call-status').innerText === "Calling...") {
+                            if (dataConnection && dataConnection.open) dataConnection.send("TIMEOUT");
+                            setTimeout(() => { endCallWithStatus("No Answer"); }, 100);
                         }
-                    }, 10 * 1000);
-
-                }).catch(err => {
-                    alert("Microphone access denied: " + err);
-                    resetToReadyState();
-                });
+                    }, 10000);
+                }).catch(err => { alert("Mic access error: " + err); closeAndClearPanel(); });
         }
 
-        // User hits the Green Accept button
         function acceptCall() {
-            clearTimeout(callTimeoutTimer);
-            stopAudioSounds();
+            clearTimeout(timeoutClock); stopAllActiveAudio();
             if (pendingCallEvent) {
                 dataConnection = peer.connect(pendingCallEvent.peer);
-                setupDataListener(dataConnection);
-
+                bindDataEvents(dataConnection);
                 navigator.mediaDevices.getUserMedia({ audio: true, video: false })
                     .then((stream) => {
                         localStream = stream;
                         pendingCallEvent.answer(stream);
-                        handleActiveCall(pendingCallEvent);
+                        processCallStream(pendingCallEvent);
                         pendingCallEvent = null;
-                    }).catch(err => {
-                        alert("Microphone access denied: " + err);
-                        endCall();
-                    });
+                    }).catch(err => { alert("Mic entry blocked: " + err); endCall(); });
             }
         }
 
-        function handleActiveCall(call) {
+        function processCallStream(call) {
             currentCall = call;
-
             call.on('stream', (remoteStream) => {
-                clearTimeout(callTimeoutTimer);
-                stopAudioSounds();
-                
-                document.getElementById('status').innerText = "Connected";
-                document.getElementById('avatar').className = "avatar-circle active";
-                document.getElementById('accept-btn').style.display = 'none';
-                document.getElementById('hangup-btn').style.display = 'flex';
-
-                const audio = new Audio();
-                audio.srcObject = remoteStream;
-                audio.play();
+                clearTimeout(timeoutClock); stopAllActiveAudio();
+                document.getElementById('call-status').innerText = "Connected";
+                document.getElementById('call-avatar').className = "avatar-circle active";
+                document.getElementById('panel-accept-btn').style.display = 'none';
+                const rAudio = new Audio(); rAudio.srcObject = remoteStream; rAudio.play();
             });
-
-            call.on('close', () => {
-                triggerCallEndedState("Call Ended");
-            });
+            call.on('close', () => { triggerUIDisplayEnded("Call Ended"); });
         }
 
         function endCall() {
-            clearTimeout(callTimeoutTimer);
-            stopAudioSounds();
-            
-            if (dataConnection && dataConnection.open) {
-                dataConnection.send("HANGUP");
-            }
-            
+            clearTimeout(timeoutClock); stopAllActiveAudio();
+            if(dataConnection && dataConnection.open) dataConnection.send("HANGUP");
             setTimeout(() => {
-                if (pendingCallEvent) { pendingCallEvent.close(); pendingCallEvent = null; }
-                if (currentCall) { currentCall.close(); currentCall = null; }
-                triggerCallEndedState("Call Ended");
-            }, 100); 
+                if(pendingCallEvent) { pendingCallEvent.close(); pendingCallEvent = null; }
+                if(currentCall) { currentCall.close(); currentCall = null; }
+                triggerUIDisplayEnded("Call Ended");
+            }, 100);
         }
 
-        function endCallWithStatus(statusMessage) {
-            clearTimeout(callTimeoutTimer);
-            stopAudioSounds();
-            if (pendingCallEvent) { pendingCallEvent.close(); pendingCallEvent = null; }
-            if (currentCall) { currentCall.close(); currentCall = null; }
-            triggerCallEndedState(statusMessage);
+        function endCallWithStatus(msg) {
+            clearTimeout(timeoutClock); stopAllActiveAudio();
+            if(pendingCallEvent) { pendingCallEvent.close(); pendingCallEvent = null; }
+            if(currentCall) { currentCall.close(); currentCall = null; }
+            triggerUIDisplayEnded(msg);
         }
 
-        function triggerCallEndedState(statusMessage) {
-            clearTimeout(callTimeoutTimer);
-            stopAudioSounds();
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
-
-            document.getElementById('status').innerText = statusMessage;
-            document.getElementById('avatar').className = "avatar-circle ended";
-            document.getElementById('hangup-btn').style.display = 'none';
-            document.getElementById('accept-btn').style.display = 'none';
-
-            setTimeout(() => {
-                resetToReadyState();
-            }, 3000);
+        function triggerUIDisplayEnded(msg) {
+            clearTimeout(timeoutClock); stopAllActiveAudio();
+            if(localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+            document.getElementById('call-status').innerText = msg;
+            document.getElementById('call-avatar').className = "avatar-circle ended";
+            document.getElementById('panel-accept-btn').style.display = 'none';
+            document.getElementById('panel-hangup-btn').style.display = 'none';
+            setTimeout(() => { closeAndClearPanel(); }, 3000);
         }
 
-        function resetToReadyState() {
-            const currentStatus = document.getElementById('status').innerText;
-            if (currentStatus === "Call Ended" || currentStatus === "No Answer") {
-                document.getElementById('status').innerText = "Ready";
-                document.getElementById('avatar').className = "avatar-circle";
-                document.getElementById('call-btn').style.display = 'flex';
-                document.getElementById('remote-id-input').style.display = 'block';
-                document.getElementById('accept-btn').style.display = 'none';
-                document.getElementById('hangup-btn').style.display = 'none';
-                currentCall = null;
-                pendingCallEvent = null;
-            }
+        function closeAndClearPanel() {
+            document.getElementById('call-panel').style.display = 'none';
+            document.getElementById('panel-hangup-btn').style.display = 'flex';
+            document.getElementById('dial-screen').value = "";
+            currentCall = null; pendingCallEvent = null;
         }
     </script>
 </body>
