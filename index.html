@@ -39,7 +39,6 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        /* Sign up Overlay */
         .overlay { 
             position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #0f172a; 
             z-index: 99; display: flex; flex-direction: column; justify-content: center; 
@@ -54,16 +53,13 @@
         .choice-btn { flex: 1; padding: 10px; background: #334155; border: 1px solid #475569; color: white; border-radius: 8px; cursor: pointer; font-size: 14px; }
         .choice-btn.active { background: #38bdf8; color: #0f172a; font-weight: bold; }
 
-        /* Top Header Area */
         .header { text-align: center; margin-top: 5px; }
         .app-title { font-size: 18px; font-weight: 600; color: #38bdf8; letter-spacing: 1px; margin-bottom: 5px; }
         .local-id { background: #0f172a; padding: 6px 14px; border-radius: 20px; display: inline-block; font-size: 13px; color: #94a3b8; border: 1px solid #334155; cursor: pointer; }
 
-        /* Dashboard Views */
         .tab-content { flex-grow: 1; display: none; flex-direction: column; justify-content: flex-start; align-items: center; margin: 10px 0; overflow-y: auto; width: 100%; }
         .tab-content.active { display: flex; }
 
-        /* Keypad Screen Layout */
         .dial-display-container { width: 100%; display: flex; align-items: center; background: #0f172a; border-radius: 10px; padding: 5px 10px; margin-bottom: 15px; border: 1px solid #334155; }
         .dial-display { flex-grow: 1; height: 40px; border: none; background: transparent; color: white; font-size: 24px; text-align: center; font-weight: bold; outline: none; pointer-events: none; }
         .dial-display.keyboard-mode { pointer-events: auto; background: #1e293b; }
@@ -89,7 +85,6 @@
         .bg-green { background: #22c55e; }
         .bg-red { background: #ef4444; }
 
-        /* Calling Takeover Screen */
         .call-screen { position: absolute; top: 0; bottom: 0; left: 0; right: 0; background: #1e293b; z-index: 10; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .avatar-circle { width: 110px; height: 110px; background: #334155; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 40px; color: #94a3b8; margin-bottom: 25px; }
         .avatar-circle.incoming { background: #38bdf8; color: white; animation: pulse 1.5s infinite; }
@@ -98,18 +93,15 @@
         .status-text { font-size: 20px; font-weight: 600; margin-bottom: 35px; }
         .call-controls { display: flex; gap: 40px; }
 
-        /* Contacts & Settings Layouts */
         .pane-card { width: 100%; padding: 5px; display: flex; flex-direction: column; align-items: flex-start; }
         .pane-title { font-size: 18px; margin-bottom: 15px; color: #38bdf8; font-weight: 600; }
         
-        /* Dynamic Contact Form */
         .contact-form { width: 100%; background: #0f172a; padding: 12px; border-radius: 10px; border: 1px solid #334155; margin-bottom: 15px; }
-        .form-input { width: 100%; background: #1e293b; border: 1px solid #475569; padding: 8px 12px; color: white; border-radius: 6px; margin-bottom: 8px; font-size: 14px; outline: none; }
-        .form-btn { background: #22c55e; color: white; padding: 8px 15px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; width: 100%; }
+        .form-input { width: 100%; background: #1e293b; border: 1px solid #475569; padding: 10px 12px; color: white; border-radius: 6px; margin-bottom: 10px; font-size: 14px; outline: none; display: block; }
+        .form-btn { background: #22c55e; color: white; padding: 10px 15px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; width: 100%; }
         
-        /* Contact List Container */
         .contacts-list-container { width: 100%; display: flex; flex-direction: column; gap: 8px; }
-        .contact-item { width: 100%; background: #0f172a; padding: 12px 15px; border-radius: 8px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.1s; }
+        .contact-item { width: 100%; background: #0f172a; padding: 12px 15px; border-radius: 8px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .contact-item:active { background: #1e293b; }
         .contact-info { display: flex; flex-direction: column; gap: 2px; }
         .contact-name { font-weight: 600; font-size: 15px; color: #f8fafc; }
@@ -120,7 +112,6 @@
         .setting-label { font-size: 14px; color: #94a3b8; margin-bottom: 5px; }
         .dropdown { width: 100%; background: #0f172a; color: white; padding: 12px; border-radius: 8px; border: 1px solid #334155; font-size: 15px; outline: none; }
         
-        /* Bottom Navigation Bar */
         .bottom-nav { 
             height: 60px; border-top: 1px solid #334155; 
             display: flex; justify-content: space-around; align-items: center; 
@@ -198,13 +189,12 @@
                 <div class="pane-title">Saved Contacts</div>
                 
                 <div class="contact-form">
-                    <input type="text" id="contact-name-input" class="form-input" placeholder="Contact Name (e.g., Base Station)">
-                    <input type="text" id="contact-code-input" class="form-input" placeholder="Device Code (4-digit code)">
+                    <input type="text" id="contact-name-input" class="form-input" placeholder="Contact Name">
+                    <input type="text" id="contact-code-input" class="form-input" placeholder="Device Code">
                     <button class="form-btn" onclick="addNewContact()">Add Contact</button>
                 </div>
 
-                <div class="contacts-list-container" id="contacts-render-box">
-                    </div>
+                <div class="contacts-list-container" id="contacts-render-box"></div>
             </div>
         </div>
 
@@ -240,11 +230,8 @@
         let timeoutClock = null;
         let audioCtx = null;
         let globalRawIdString = "";
-
-        // Core Address Book Array Array
         let contactsList = [];
 
-        // Load saved contacts on initial app boot
         window.addEventListener('DOMContentLoaded', () => {
             const savedData = localStorage.getItem('callandroid_contacts');
             if (savedData) {
@@ -291,31 +278,42 @@
             document.getElementById('nav-' + target).classList.add('active');
         }
 
-        // Contact CRUD Handlers
         function renderContactsUI() {
             const container = document.getElementById('contacts-render-box');
             container.innerHTML = "";
             
             if(contactsList.length === 0) {
-                container.innerHTML = `<p style="color:#64748b; font-size:13px; text-align:center; width:100%; margin-top:10px;">No saved contacts yet.</p>`;
+                container.innerHTML = `<p style="color:#64748b; font-size:13px; text-align:center; width:100%; margin-top:10px;">No saved contacts.</p>`;
                 return;
             }
 
             contactsList.forEach((item, index) => {
                 const row = document.createElement('div');
                 row.className = "contact-item";
-                // Tapping entry auto-dials it
-                row.setAttribute('onclick', `selectContactToDial('${item.code}')`);
+                
+                // Clicking the outer row selects the contact and returns to keypad
+                row.addEventListener('click', (e) => {
+                    if (!e.target.closest('.delete-contact-btn')) {
+                        selectContactToDial(item.code);
+                    }
+                });
                 
                 row.innerHTML = `
                     <div class="contact-info">
                         <span class="contact-name">${item.name}</span>
                         <span class="contact-code">${item.code}</span>
                     </div>
-                    <button class="delete-contact-btn" onclick="deleteContactEntry(event, ${index})">
+                    <button class="delete-contact-btn">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                 `;
+
+                // Specifically bind the button item
+                row.querySelector('.delete-contact-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteContactEntry(index);
+                });
+
                 container.appendChild(row);
             });
         }
@@ -328,7 +326,7 @@
             const code = codeIn.value.trim().toLowerCase();
 
             if(!name || !code) {
-                alert("Please fill out both the Name and Device Code fields.");
+                alert("Please fill out both fields.");
                 return;
             }
 
@@ -341,8 +339,7 @@
             renderContactsUI();
         }
 
-        function deleteContactEntry(event, index) {
-            event.stopPropagation(); // Prevents tapping delete from triggering dialing handler
+        function deleteContactEntry(index) {
             if(confirm("Delete this contact?")) {
                 contactsList.splice(index, 1);
                 localStorage.setItem('callandroid_contacts', JSON.stringify(contactsList));
