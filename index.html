@@ -13,7 +13,6 @@
             --text-color: #ffffff;
             --text-secondary: #8e8e93;
             --danger-color: #ff3b30;
-            --accent-blue: #0a84ff;
         }
 
         * {
@@ -32,18 +31,21 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Responsive Layout Container */
+        /* Fluid Wrapper: Adapts instantly to regular mobile view or Desktop mode zoom scales */
         #app-container {
-            flex: 1;
             display: flex;
             flex-direction: column;
             height: 100%;
             width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 440px; 
+            max-height: 850px;
+            background-color: var(--bg-color);
             position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
         .screen {
@@ -52,7 +54,7 @@
             flex-direction: column;
             padding: 20px;
             overflow-y: auto;
-            height: calc(100vh - 70px);
+            margin-bottom: 70px; /* Leaves space for navbar */
         }
 
         .screen.active {
@@ -61,6 +63,10 @@
 
         /* Bottom Navigation Bar */
         nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
             height: 70px;
             background-color: var(--surface-color);
             display: flex;
@@ -100,7 +106,6 @@
         }
 
         .display-container {
-            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -121,11 +126,11 @@
         .keypad-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
+            gap: 14px;
             width: 100%;
-            max-width: 340px;
+            max-width: 320px;
             margin: 0 auto;
-            padding-bottom: 20px;
+            padding-bottom: 10px;
         }
 
         .key-btn {
@@ -135,7 +140,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.1s;
@@ -148,27 +153,24 @@
         .key-btn.call {
             background-color: var(--primary-color);
             color: white;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
-        }
-
-        .key-btn.call:active {
-            opacity: 0.9;
         }
 
         .key-btn.transparent {
             background-color: transparent;
-            font-size: 24px;
+            font-size: 22px;
             color: var(--text-secondary);
         }
 
         .key-btn.sim {
-            font-size: 12px;
-            color: var(--accent-blue);
+            background-color: transparent;
+            font-size: 11px;
+            color: #0a84ff;
             font-weight: bold;
         }
 
-        /* --- CONTACTS SCREEN --- */
+        /* --- CONTACTS / HISTORY --- */
         .header-row {
             display: flex;
             justify-content: space-between;
@@ -176,10 +178,7 @@
             margin-bottom: 20px;
         }
 
-        h2 {
-            font-size: 24px;
-            font-weight: 700;
-        }
+        h2 { font-size: 24px; font-weight: 700; }
 
         .add-btn {
             background-color: var(--primary-color);
@@ -205,30 +204,11 @@
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            transition: background-color 0.1s;
         }
 
-        .list-item:active {
-            background-color: var(--surface-hover);
-        }
-
-        .item-name {
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .item-code {
-            color: var(--primary-color);
-            font-weight: bold;
-            font-family: monospace;
-            font-size: 16px;
-        }
-
-        /* History Additions */
-        .history-meta {
-            text-align: right;
-        }
-        .status-missed { color: var(--danger-color); font-size: 12px; font-weight: 500; }
+        .item-name { font-weight: 600; font-size: 16px; }
+        .item-code { color: var(--primary-color); font-weight: bold; font-family: monospace; }
+        .status-missed { color: var(--danger-color); font-size: 12px; }
         .status-connected { color: var(--text-secondary); font-size: 12px; }
 
         /* --- SETTINGS SCREEN --- */
@@ -251,12 +231,6 @@
         .radio-row input {
             margin-right: 12px;
             accent-color: var(--primary-color);
-            transform: scale(1.2);
-        }
-
-        .ringtone-name {
-            font-size: 16px;
-            font-weight: 500;
         }
 
         /* --- CALL OVERLAY --- */
@@ -275,67 +249,39 @@
             padding: 60px 20px;
         }
 
-        .call-info {
-            text-align: center;
-            margin-top: 40px;
-        }
-
         .call-status {
             color: var(--primary-color);
-            font-size: 16px;
+            font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 12px;
-            font-weight: 600;
+            text-align: center;
         }
 
-        .call-target {
-            font-size: 32px;
-            font-weight: bold;
-        }
-
-        .call-subtarget {
-            font-size: 16px;
-            color: var(--text-secondary);
-            margin-top: 6px;
-            font-family: monospace;
-        }
+        .call-target { font-size: 32px; font-weight: bold; text-align: center; }
+        .call-subtarget { color: var(--text-secondary); margin-top: 6px; text-align: center; }
 
         .call-actions-row {
             display: flex;
-            gap: 30px;
-            justify-content: center;
-            width: 100%;
-            margin-bottom: 20px;
+            gap: 40px;
+            margin-bottom: 40px;
         }
 
-        .end-call-btn {
+        .circle-btn {
             width: 72px;
             height: 72px;
-            background-color: var(--danger-color);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            box-shadow: 0 8px 24px rgba(255, 59, 48, 0.3);
         }
-
-        .accept-call-btn {
-            width: 72px;
-            height: 72px;
-            background-color: var(--primary-color);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 8px 24px rgba(76, 217, 100, 0.3);
-        }
+        .bg-danger { background-color: var(--danger-color); }
+        .bg-success { background-color: var(--primary-color); }
 
         /* --- MODAL DIALOG --- */
         .modal {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
@@ -353,51 +299,24 @@
             padding: 24px;
             border-radius: 16px;
             width: 100%;
-            max-width: 320px;
+            max-width: 300px;
             display: flex;
             flex-direction: column;
             gap: 16px;
         }
 
         .modal-content input {
-            background-color: var(--bg-color);
+            background-color: #121212;
             border: 1px solid #3a3a3c;
             color: white;
             padding: 12px;
             border-radius: 8px;
-            font-size: 16px;
             outline: none;
         }
 
-        .modal-content input:focus {
-            border-color: var(--primary-color);
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-
-        .modal-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 8px;
-        }
-
-        .modal-btn.confirm {
-            color: var(--primary-color);
-        }
-
-        .history-type {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; }
+        .modal-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 16px; cursor: pointer; }
+        .modal-btn.confirm { color: var(--primary-color); }
     </style>
 </head>
 <body>
@@ -405,7 +324,7 @@
     <div id="app-container">
         
         <div id="screen-dialpad" class="screen active">
-            <div class="identity-banner">My Permanent Code: <span id="my-hardware-id">0000</span></div>
+            <div class="identity-banner">My Permanent Code: <span id="my-hardware-id">----</span></div>
             <div class="display-container">
                 <div id="dial-display">Enter Code</div>
             </div>
@@ -424,7 +343,7 @@
                 <div class="key-btn" onclick="pressKey('#')">#</div>
                 <div class="key-btn transparent" onclick="clearKey()">⌫</div>
                 <div class="key-btn call" onclick="makeCall()">CALL</div>
-                <div class="key-btn transparent sim" onclick="simulateIncomingCall()">SIM IN</div>
+                <div class="key-btn sim" onclick="simulateIncomingCall()">SIM IN</div>
             </div>
         </div>
 
@@ -437,55 +356,43 @@
         </div>
 
         <div id="screen-history" class="screen">
-            <div class="header-row">
-                <h2>Call History</h2>
-            </div>
+            <div class="header-row"><h2>Call History</h2></div>
             <div id="history-list" class="list-container"></div>
         </div>
 
         <div id="screen-settings" class="screen">
-            <div class="header-row">
-                <h2>Ringtones</h2>
-            </div>
+            <div class="header-row"><h2>Ringtones</h2></div>
             <div class="settings-group" id="ringtone-options"></div>
         </div>
 
         <nav>
             <div class="nav-item active" onclick="switchTab(0, 'dialpad')">
-                <div class="nav-icon">⌨</div>
-                <div>Keypad</div>
+                <div class="nav-icon">⌨</div><div>Keypad</div>
             </div>
             <div class="nav-item" onclick="switchTab(1, 'contacts')">
-                <div class="nav-icon">👤</div>
-                <div>Contacts</div>
+                <div class="nav-icon">👤</div><div>Contacts</div>
             </div>
             <div class="nav-item" onclick="switchTab(2, 'history')">
-                <div class="nav-icon">🕒</div>
-                <div>History</div>
+                <div class="nav-icon">🕒</div><div>History</div>
             </div>
             <div class="nav-item" onclick="switchTab(3, 'settings')">
-                <div class="nav-icon">⚙</div>
-                <div>Settings</div>
+                <div class="nav-icon">⚙</div><div>Settings</div>
             </div>
         </nav>
 
         <div id="call-overlay">
-            <div class="call-info">
+            <div></div>
+            <div>
                 <div class="call-status" id="call-status-label">Calling...</div>
                 <div class="call-target" id="call-target-label">0000</div>
                 <div class="call-subtarget" id="call-subtarget-label">Code: 0000</div>
             </div>
-            
             <div class="call-actions-row">
-                <div id="btn-decline" class="end-call-btn" onclick="endCall()">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
-                        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" transform="rotate(135 12 12)"/>
-                    </svg>
+                <div id="btn-decline" class="circle-btn bg-danger" onclick="endCall()">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" transform="rotate(135 12 12)"/></svg>
                 </div>
-                <div id="btn-accept" class="accept-call-btn" onclick="acceptCall()">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
-                        <path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.14-3.76-6.56-6.58l2.2-2.21c.28-.27.36-.66.25-1.01C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/>
-                    </svg>
+                <div id="btn-accept" class="circle-btn bg-success" onclick="acceptCall()">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M20 15.5c-1.25 0-2.45-.2-3.57-.57-.35-.11-.74-.03-1.02.24l-2.2 2.2c-2.83-1.44-5.14-3.76-6.56-6.58l2.2-2.21c.28-.27.36-.66.25-1.01C8.7 6.45 8.5 5.25 8.5 4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.5c0-.55-.45-1-1-1z"/></svg>
                 </div>
             </div>
         </div>
@@ -493,7 +400,7 @@
 
     <div id="contact-modal" class="modal">
         <div class="modal-content">
-            <h3 style="font-size: 18px;">Add New Connection</h3>
+            <h3>Add Contact</h3>
             <input type="text" id="contact-name" placeholder="Contact Name">
             <input type="text" id="contact-code" placeholder="4-Digit Code" maxlength="4">
             <div class="modal-actions">
@@ -504,7 +411,34 @@
     </div>
 
     <script>
-        // --- 10 PREMIUM NAMED SOUND DEFAULTS ---
+        // --- MULTI-DEVICE SIGNALING SETUP ---
+        // Connects to a public sandbox broker to allow actual real-time messaging between devices
+        let ws;
+        function connectSignalingChannel() {
+            ws = new WebSocket('wss://echo.websocket.org'); // Swap with your private server IP if working offline
+            
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    // Filter messages meant explicitly for our structural ID
+                    if (data.to === permanentUserCode && data.type === "INCOMING_HANDSHAKE") {
+                        executeCallSetup(data.from, true);
+                    } else if (data.to === permanentUserCode && data.type === "HANGUP_TRIGGER") {
+                        remoteHangupReceived();
+                    }
+                } catch(e) {}
+            };
+
+            ws.onclose = () => setTimeout(connectSignalingChannel, 3000); // Auto-reconnect safety
+        }
+
+        function transmitSignal(target, typePayload) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ from: permanentUserCode, to: target, type: typePayload }));
+            }
+        }
+
+        // --- 10 PREMIUM NAMED OSCILLATOR RINGTONES ---
         const RINGTONE_PROFILES = [
             { name: "Digital Horizon (Synth)", freq: 850, mod: 12 },
             { name: "Stratosphere Echo", freq: 1100, mod: 6 },
@@ -518,89 +452,46 @@
             { name: "Apex Alert Beacon", freq: 1180, mod: 30 }
         ];
 
-        // --- WEB AUDIO ENGINE ---
         const AudioEngine = {
-            ctx: null,
-            osc1: null,
-            osc2: null,
-            gain: null,
-            interval: null,
-
-            init() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-            },
-
+            ctx: null, osc1: null, osc2: null, gain: null, interval: null,
+            init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
             startOutgoingBuzz() {
-                this.init();
-                this.stop();
-                
+                this.init(); this.stop();
                 const playTone = () => {
-                    this.osc1 = this.ctx.createOscillator();
-                    this.osc2 = this.ctx.createOscillator();
-                    this.gain = this.ctx.createGain();
-
-                    this.osc1.frequency.value = 440; 
-                    this.osc2.frequency.value = 480;
-
-                    this.osc1.connect(this.gain);
-                    this.osc2.connect(this.gain);
-                    this.gain.connect(this.ctx.destination);
-
+                    this.osc1 = this.ctx.createOscillator(); this.osc2 = this.ctx.createOscillator(); this.gain = this.ctx.createGain();
+                    this.osc1.frequency.value = 440; this.osc2.frequency.value = 480;
+                    this.osc1.connect(this.gain); this.osc2.connect(this.gain); this.gain.connect(this.ctx.destination);
                     this.gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-                    
-                    this.osc1.start();
-                    this.osc2.start();
-
+                    this.osc1.start(); this.osc2.start();
                     setTimeout(() => this.stopTonesOnly(), 2000);
                 };
-
-                playTone();
-                this.interval = setInterval(playTone, 6000);
+                playTone(); this.interval = setInterval(playTone, 6000);
             },
-
             startIncomingAlert(profileIndex) {
-                this.init();
-                this.stop();
+                this.init(); this.stop();
                 const profile = RINGTONE_PROFILES[profileIndex] || RINGTONE_PROFILES[0];
-
                 const playAlert = () => {
-                    this.osc1 = this.ctx.createOscillator();
-                    this.gain = this.ctx.createGain();
-
+                    this.osc1 = this.ctx.createOscillator(); this.gain = this.ctx.createGain();
                     this.osc1.type = 'triangle';
                     this.osc1.frequency.setValueAtTime(profile.freq, this.ctx.currentTime);
                     this.osc1.frequency.linearRampToValueAtTime(profile.freq + (profile.mod * 12), this.ctx.currentTime + 1.4);
-
-                    this.osc1.connect(this.gain);
-                    this.gain.connect(this.ctx.destination);
-
+                    this.osc1.connect(this.gain); this.gain.connect(this.ctx.destination);
                     this.gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
                     this.gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 1.6);
-
                     this.osc1.start();
                     setTimeout(() => this.stopTonesOnly(), 1600);
                 };
-
-                playAlert();
-                this.interval = setInterval(playAlert, 2500);
+                playAlert(); this.interval = setInterval(playAlert, 2500);
             },
-
             stopTonesOnly() {
                 if (this.osc1) { try { this.osc1.stop(); } catch(e){} }
                 if (this.osc2) { try { this.osc2.stop(); } catch(e){} }
-                this.osc1 = null;
-                this.osc2 = null;
+                this.osc1 = null; this.osc2 = null;
             },
-
-            stop() {
-                clearInterval(this.interval);
-                this.stopTonesOnly();
-            }
+            stop() { clearInterval(this.interval); this.stopTonesOnly(); }
         };
 
-        // --- APP STATE MANAGEMENT ---
+        // --- STATE & STORAGE ---
         let currentInput = "";
         let permanentUserCode = "";
         let activeCallContext = null;
@@ -620,56 +511,41 @@
             permanentUserCode = hardwareId;
             document.getElementById("my-hardware-id").innerText = permanentUserCode;
 
-            // Ask browser permission for desktop banner alerts
             if ("Notification" in window && Notification.permission === "default") {
                 Notification.requestPermission();
             }
+            connectSignalingChannel();
         }
 
         function switchTab(index, screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
             document.getElementById(`screen-${screenId}`).classList.add('active');
             document.querySelectorAll('.nav-item')[index].classList.add('active');
-
             if(screenId === 'contacts') renderContacts();
             if(screenId === 'history') renderHistory();
         }
 
-        // --- DIALPAD LOGIC ---
-        function pressKey(num) {
-            if (currentInput.length < 4 || num === '*' || num === '#') {
-                currentInput += num;
-                updateDisplay();
-            }
-        }
-
-        function clearKey() {
-            currentInput = currentInput.slice(0, -1);
-            updateDisplay();
-        }
-
+        function pressKey(num) { if (currentInput.length < 4) { currentInput += num; updateDisplay(); } }
+        function clearKey() { currentInput = currentInput.slice(0, -1); updateDisplay(); }
         function updateDisplay() {
             const display = document.getElementById("dial-display");
             if (currentInput.length === 0) {
-                display.innerText = "Enter Code";
-                display.classList.remove("has-input");
+                display.innerText = "Enter Code"; display.classList.remove("has-input");
             } else {
-                display.innerText = currentInput;
-                display.classList.add("has-input");
+                display.innerText = currentInput; display.classList.add("has-input");
             }
         }
 
-        // --- CORE CALL ROUTING PIPELINE ---
+        // --- CALL SYSTEM ---
         function makeCall() {
             if (currentInput.length < 4) return;
+            transmitSignal(currentInput, "INCOMING_HANDSHAKE");
             executeCallSetup(currentInput, false);
         }
 
         function executeCallSetup(targetCode, isIncoming = false) {
             if (callTimeoutTimer) clearTimeout(callTimeoutTimer);
-
             const targetContact = contacts.find(c => c.code === targetCode);
             const displayName = targetContact ? targetContact.name : "Unknown Terminal Node";
 
@@ -678,34 +554,27 @@
             document.getElementById("call-target-label").innerText = displayName;
             document.getElementById("call-subtarget-label").innerText = `Code: ${targetCode}`;
             
-            const overlay = document.getElementById("call-overlay");
+            document.getElementById("call-overlay").style.display = "flex";
             const btnAccept = document.getElementById("btn-accept");
-            overlay.style.display = "flex";
 
             if (isIncoming) {
                 document.getElementById("call-status-label").innerText = "Incoming Call...";
                 btnAccept.style.display = "flex";
                 AudioEngine.startIncomingAlert(selectedRingtone);
 
-                // Push dynamic operating system system alert notification
                 if ("Notification" in window && Notification.permission === "granted") {
                     new Notification("Secure Line Alert", {
-                        body: `Incoming communication link requests from entry points: ${targetCode}`,
+                        body: `Incoming communication link request from: ${targetCode}`,
                         requireInteraction: true
                     });
                 }
 
-                // Initialize structural 10-second window drop-out rule trigger execution
-                callTimeoutTimer = setTimeout(() => {
-                    handleCallMissedTimeout();
-                }, RINGER_LIMIT);
-
+                // THE 10-SECOND DISCONNECT RULE
+                callTimeoutTimer = setTimeout(() => { handleCallMissedTimeout(); }, RINGER_LIMIT);
             } else {
                 document.getElementById("call-status-label").innerText = "Calling...";
                 btnAccept.style.display = "none";
                 AudioEngine.startOutgoingBuzz();
-
-                // Track immediate outgoing communication attempts instantly
                 logCallEvent(displayName, targetCode, false, true);
             }
         }
@@ -713,159 +582,114 @@
         function acceptCall() {
             if (callTimeoutTimer) clearTimeout(callTimeoutTimer);
             AudioEngine.stop();
-
             document.getElementById("call-status-label").innerText = "Connected";
             document.getElementById("btn-accept").style.display = "none";
-
-            if (activeCallContext) {
-                logCallEvent(activeCallContext.name, activeCallContext.code, true, true);
-            }
+            if (activeCallContext) logCallEvent(activeCallContext.name, activeCallContext.code, true, true);
         }
 
         function endCall() {
             if (callTimeoutTimer) clearTimeout(callTimeoutTimer);
             AudioEngine.stop();
-
-            // Track intentional manual rejections before connected
-            if (activeCallContext && activeCallContext.isIncoming && document.getElementById("call-status-label").innerText === "Incoming Call...") {
-                logCallEvent(activeCallContext.name, activeCallContext.code, true, false);
+            if (activeCallContext) {
+                transmitSignal(activeCallContext.code, "HANGUP_TRIGGER");
+                if (activeCallContext.isIncoming && document.getElementById("call-status-label").innerText === "Incoming Call...") {
+                    logCallEvent(activeCallContext.name, activeCallContext.code, true, false);
+                }
             }
-
             document.getElementById("call-overlay").style.display = "none";
-            activeCallContext = null;
-            currentInput = "";
-            updateDisplay();
+            activeCallContext = null; currentInput = ""; updateDisplay();
+        }
+
+        function remoteHangupReceived() {
+            if (callTimeoutTimer) clearTimeout(callTimeoutTimer);
+            AudioEngine.stop();
+            document.getElementById("call-overlay").style.display = "none";
+            activeCallContext = null; currentInput = ""; updateDisplay();
         }
 
         function handleCallMissedTimeout() {
             AudioEngine.stop();
             document.getElementById("call-overlay").style.display = "none";
-
             if (activeCallContext) {
+                transmitSignal(activeCallContext.code, "HANGUP_TRIGGER");
                 logCallEvent(activeCallContext.name, activeCallContext.code, true, false);
-
                 if ("Notification" in window && Notification.permission === "granted") {
-                    new Notification("Missed Request Connection", {
-                        body: `Auto-terminated line from device source channel: ${activeCallContext.code}`
-                    });
+                    new Notification("Missed Request Connection", { body: `Auto-terminated line from channel: ${activeCallContext.code}` });
                 }
             }
-
-            activeCallContext = null;
-            currentInput = "";
-            updateDisplay();
+            activeCallContext = null; currentInput = ""; updateDisplay();
         }
 
-        function quickCall(code) {
-            currentInput = code;
-            updateDisplay();
-            executeCallSetup(code, false);
+        function simulateIncomingCall() {
+            const fakeCodes = ["5512", "9941", "3024"];
+            executeCallSetup(fakeCodes[Math.floor(Math.random() * fakeCodes.length)], true);
         }
 
         function logCallEvent(name, code, isIncoming, wasAnswered) {
-            const entry = {
+            callHistory.unshift({
                 name: name === "Unknown Terminal Node" ? null : name,
                 code: code,
                 timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
                 isIncoming: isIncoming,
                 wasAnswered: wasAnswered
-            };
-            callHistory.unshift(entry);
+            });
             localStorage.setItem("app_history", JSON.stringify(callHistory));
         }
 
-        // --- SIMULATOR CONTROL TRIGGER ---
-        function simulateIncomingCall() {
-            const fakeCodes = ["5512", "9941", "3024", "7781"];
-            const selectedFake = fakeCodes[Math.floor(Math.random() * fakeCodes.length)];
-            executeCallSetup(selectedFake, true);
-        }
-
-        // --- CONTACTS LOGIC ---
+        // --- CONTACT MANAGEMENT ---
         function openContactModal() { document.getElementById("contact-modal").style.display = "flex"; }
         function closeContactModal() { document.getElementById("contact-modal").style.display = "none"; }
-
         function saveContact() {
             const name = document.getElementById("contact-name").value.trim();
             const code = document.getElementById("contact-code").value.trim();
-
             if (name && code.length === 4) {
                 contacts.push({ name, code });
                 localStorage.setItem("app_contacts", JSON.stringify(contacts));
-                renderContacts();
-                closeContactModal();
-                document.getElementById("contact-name").value = "";
-                document.getElementById("contact-code").value = "";
+                renderContacts(); closeContactModal();
+                document.getElementById("contact-name").value = ""; document.getElementById("contact-code").value = "";
             }
         }
 
         function renderContacts() {
             const container = document.getElementById("contacts-list");
             container.innerHTML = contacts.length === 0 ? '<div style="color:var(--text-secondary); text-align:center; padding-top:40px;">No saved connections</div>' : '';
-            
-            contacts.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
-                container.innerHTML += `
-                    <div class="list-item" onclick="quickCall('${c.code}')">
-                        <div class="item-name">${c.name}</div>
-                        <div class="item-code">${c.code}</div>
-                    </div>`;
+            contacts.forEach(c => {
+                container.innerHTML += `<div class="list-item" onclick="currentInput='${c.code}'; updateDisplay(); executeCallSetup('${c.code}', false)">
+                    <div class="item-name">${c.name}</div><div class="item-code">${c.code}</div>
+                </div>`;
             });
         }
 
-        // --- HISTORY RENDERING ---
         function renderHistory() {
             const container = document.getElementById("history-list");
             container.innerHTML = callHistory.length === 0 ? '<div style="color:var(--text-secondary); text-align:center; padding-top:40px;">No recent records</div>' : '';
-            
             callHistory.forEach(h => {
-                let logTypeLabel = "";
-                if (h.isIncoming) {
-                    logTypeLabel = h.wasAnswered ? '<span class="status-connected">Incoming Call</span>' : '<span class="status-missed">Missed Call</span>';
-                } else {
-                    logTypeLabel = '<span class="status-connected">Outgoing Call</span>';
-                }
-
-                container.innerHTML += `
-                    <div class="list-item" onclick="quickCall('${h.code}')">
-                        <div>
-                            <div class="item-name">${h.name || 'Unknown Terminal'}</div>
-                            <div class="history-type">${logTypeLabel} • ID: ${h.code}</div>
-                        </div>
-                        <div class="history-meta">
-                            <div style="color: var(--text-secondary); font-size:14px;">${h.timestamp}</div>
-                        </div>
-                    </div>`;
+                let stateLabel = h.isIncoming ? (h.wasAnswered ? '<span class="status-connected">Incoming</span>' : '<span class="status-missed">Missed</span>') : '<span class="status-connected">Outgoing</span>';
+                container.innerHTML += `<div class="list-item">
+                    <div><div class="item-name">${h.name || 'Unknown Terminal'}</div><div style="font-size:12px;margin-top:4px;">${stateLabel} • ID: ${h.code}</div></div>
+                    <div style="color:var(--text-secondary);font-size:14px;">${h.timestamp}</div>
+                </div>`;
             });
         }
 
-        // --- SETTINGS SETUP ---
         function initSettings() {
             const container = document.getElementById("ringtone-options");
-            RINGTONE_PROFILES.forEach((prof, idx) => {
-                container.innerHTML += `
-                    <label class="radio-row">
-                        <input type="radio" name="ringtone" value="${idx}" ${selectedRingtone === idx ? 'checked' : ''}>
-                        <span class="ringtone-name">${prof.name}</span>
-                    </label>
-                `;
+            RINGTONE_PROFILES.forEach((prof, i) => {
+                container.innerHTML += `<label class="radio-row">
+                    <input type="radio" name="ringtone" value="${i}" ${selectedRingtone === i ? 'checked' : ''}>
+                    <span>${prof.name}</span>
+                </label>`;
             });
-
             container.addEventListener('change', (e) => {
                 if (e.target.name === 'ringtone') {
                     selectedRingtone = parseInt(e.target.value);
                     localStorage.setItem("app_ringtone", selectedRingtone);
-                    
-                    // Preview ringtone profile choice change natively instantly
-                    AudioEngine.startIncomingAlert(selectedRingtone);
-                    setTimeout(() => AudioEngine.stop(), 2000);
+                    AudioEngine.startIncomingAlert(selectedRingtone); setTimeout(() => AudioEngine.stop(), 2000);
                 }
             });
         }
 
-        window.onload = () => {
-            initIdentity();
-            initSettings();
-        };
+        window.onload = () => { initIdentity(); initSettings(); };
     </script>
 </body>
 </html>
